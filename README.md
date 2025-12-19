@@ -90,7 +90,7 @@ Blackbox Exporter (9115)
 kubectl port-forward --address=0.0.0.0 svc/blackbox-exporter -n monitoring 9115:9115
 
 Headlamp (4466)
-kubectl port-forward --address=0.0.0.0 svc/headlamp -n monitoring 4466:443
+kubectl port-forward --address=0.0.0.0 svc/headlamp -n kube-system 4466:80
 
 7. Access URLs
 
