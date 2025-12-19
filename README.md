@@ -110,6 +110,8 @@ Blackbox Exporter: http://PUBLIC_IP:9115/probe?target=https://google.com&module=
 
 Headlamp UI: http://PUBLIC_IP:4466
 
+Use this command to generate Auth ID : kubectl -n kube-system create token headlamp-admin
+
 8. Grafana Login Credentials
 
 Default user: admin
