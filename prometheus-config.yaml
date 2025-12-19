@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      external_labels:
+        cluster: kind
+        replica: prometheus-0
+
+    scrape_configs:
+
+    # 1. Prometheus itself
+    - job_name: prometheus
+      static_configs:
+      - targets:
+        - localhost:9090
+
+    # 2. kube-state-metrics
+    - job_name: kube-state-metrics
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name]
+        action: keep
+        regex: monitoring;kube-state-metrics
+
+    # 3. node-exporter
+    - job_name: node-exporter
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name]
+        action: keep
+        regex: monitoring;node-exporter
+
+    # 4. blackbox exporter (HTTP checks)
+    - job_name: blackbox-http
+      metrics_path: /probe
+      params:
+        module: [http_2xx]
+      static_configs:
+      - targets:
+        - https://google.com
+        - http://grafana.monitoring.svc:3000
+      relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter.monitoring.svc:9115
